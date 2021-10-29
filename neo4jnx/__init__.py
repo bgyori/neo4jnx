@@ -122,11 +122,14 @@ class NodeView:
             return self.graph.query_tx(query)[0][0]
 
     def __getitem__(self, index):
-        with self.graph.driver.session() as session:
-            query = """MATCH (node:Node {`name`: $value }) RETURN node"""
-            n = session.run(query, {"value": index}).single()["node"]
-            data = {k: n[k] for k in n.keys() if k != 'name'}
-            return data
+        try:
+            with self.graph.driver.session() as session:
+                query = """MATCH (node:Node {`name`: $value }) RETURN node"""
+                n = session.run(query, {"value": index}).single()["node"]
+                data = {k: n[k] for k in n.keys() if k != 'name'}
+                return data
+        except TypeError:
+            raise KeyError(index)
 
     def __call__(self, data=False, default=None):
         with self.graph.driver.session() as session:
@@ -152,7 +155,7 @@ class NodeView:
     def get(self, index, default=None):
         try:
             return self.__getitem__(index)
-        except Exception as exc:  # FIXME: does getitem raise KeyError?
+        except KeyError:
             return default
 
 
