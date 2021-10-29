@@ -162,6 +162,17 @@ class EdgeView:
                    RETURN COUNT(r)"""
         return self.graph.query_tx(query)[0][0]
 
+    def __getitem__(self, edge):
+        s, t = edge
+        # return lookup of edge specifically; looks exactly like
+        # AtlasView's __getitem__ ~95 ms, but here that method is exposed
+        # directly
+        query = """MATCH (u:Node)-[r:Relation]->(v:Node)
+                   WHERE u.name = '%s' AND v.name = '%s'
+                   RETURN r""" % (s, t)
+        return extract_properties(self.graph.query_tx(query)[0][0],
+                                  self.graph.property_loaders)
+
     def __call__(self, data=False, default=None):
         with self.graph.driver.session() as session:
             query = """MATCH (u:Node)-[r:Relation]->(v:Node)
