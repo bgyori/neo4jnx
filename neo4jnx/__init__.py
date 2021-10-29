@@ -5,8 +5,8 @@ from neo4j import GraphDatabase
 
 
 def extract_properties(properties, property_loaders):
-     return {k: extract_value(v, property_loaders.get(k))
-             for k, v in properties.items()}
+    return {k: extract_value(v, property_loaders.get(k))
+            for k, v in properties.items()}
 
 
 def extract_value(v, loader):
