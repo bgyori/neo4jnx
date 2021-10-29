@@ -193,8 +193,11 @@ class EdgeView:
         query = """MATCH (u:Node)-[r:Relation]->(v:Node)
                    WHERE u.name = '%s' AND v.name = '%s'
                    RETURN r""" % (s, t)
-        return extract_properties(self.graph.query_tx(query)[0][0],
-                                  self.graph.property_loaders)
+        try:
+            return extract_properties(self.graph.query_tx(query)[0][0],
+                                      self.graph.property_loaders)
+        except IndexError:
+            raise KeyError(edge)
 
     def __call__(self, data=False, default=None):
         with self.graph.driver.session() as session:
