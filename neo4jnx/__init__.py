@@ -76,6 +76,12 @@ class Neo4jDiGraph(nx.DiGraph):
     def __len__(self):
         return len(self.nodes)
 
+    def get_edge_data(self, u, v, default=None):
+        try:
+            return self.edges[(u, v)]
+        except KeyError:
+            return default
+
     def number_of_nodes(self):
         return len(self.nodes)
 
@@ -186,7 +192,7 @@ class EdgeView:
 
     def __getitem__(self, edge):
         s, t = edge
-        # return lookup of edge specifically; looks exactly like
+        # return lookup of specific edge; looks exactly like
         # AtlasView's __getitem__, but here that method is exposed
         # directly when using graph.edges[(s, t)]
         # Timing ~100 ms
