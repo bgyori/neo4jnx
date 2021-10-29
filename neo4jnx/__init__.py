@@ -190,6 +190,10 @@ class EdgeView:
         # AtlasView's __getitem__, but here that method is exposed
         # directly when using graph.edges[(s, t)]
         # Timing ~100 ms
+        if "'" in s:
+            s = s.replace("'", r"\'")
+        if "'" in t:
+            t = t.replace("'", r"\'")
         query = """MATCH (u:Node)-[r:Relation]->(v:Node)
                    WHERE u.name = '%s' AND v.name = '%s'
                    RETURN r""" % (s, t)
@@ -269,6 +273,10 @@ class AtlasView:
             return self.relation_from_source_target(n, self.n)
 
     def relation_from_source_target(self, s, t):
+        if "'" in s:
+            s = s.replace("'", r"\'")
+        if "'" in t:
+            t = t.replace("'", r"\'")
         query = """MATCH (u:Node)-[r:Relation]->(v:Node)
                    WHERE u.name = '%s' AND v.name = '%s'
                    RETURN r""" % (s, t)
