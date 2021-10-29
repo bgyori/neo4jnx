@@ -187,8 +187,9 @@ class EdgeView:
     def __getitem__(self, edge):
         s, t = edge
         # return lookup of edge specifically; looks exactly like
-        # AtlasView's __getitem__ ~95 ms, but here that method is exposed
-        # directly
+        # AtlasView's __getitem__, but here that method is exposed
+        # directly when using graph.edges[(s, t)]
+        # Timing ~100 ms
         query = """MATCH (u:Node)-[r:Relation]->(v:Node)
                    WHERE u.name = '%s' AND v.name = '%s'
                    RETURN r""" % (s, t)
