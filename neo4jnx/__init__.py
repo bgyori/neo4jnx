@@ -2,6 +2,7 @@ from typing import Optional, Union, List, Any
 import networkx as nx
 import neo4j
 from neo4j import GraphDatabase
+from networkx import NetworkXError
 
 
 def extract_properties(properties, property_loaders):
@@ -50,9 +51,21 @@ class Neo4jDiGraph(nx.DiGraph):
     def pred(self):
         return PredView(self)
 
+    def predecessors(self, n):
+        try:
+            return iter(self.pred[n])
+        except KeyError as e:
+            raise NetworkXError(f"The node {n} is not in the digraph.") from e
+
     @property
     def succ(self):
         return SuccView(self)
+
+    def successors(self, n):
+        try:
+            return iter(self.succ[n])
+        except KeyError as e:
+            raise NetworkXError(f"The node {n} is not in the digraph.") from e
 
     def __iter__(self):
         return iter(self.nodes)
