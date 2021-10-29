@@ -149,6 +149,12 @@ class NodeView:
             n = session.run(query, {"value": n}).single()
             return True if n else False
 
+    def get(self, index, default=None):
+        try:
+            return self.__getitem__(index)
+        except Exception as exc:  # FIXME: does getitem raise KeyError?
+            return default
+
 
 class EdgeView:
     def __init__(self, graph):
