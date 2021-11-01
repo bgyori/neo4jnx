@@ -303,7 +303,7 @@ class AtlasView:
                                   self.graph.property_loaders)
 
 
-def _edge_view_call_query(nbunch=None, data=False):
+def _edge_view_call_query(nbunch=None, data=False, reverse=False):
     # If nbunch is None, return all edges, otherwise filter to the ones
     # that are in nbunch
     # If data is None, return the edges without edge data otherwise return
@@ -317,12 +317,18 @@ def _edge_view_call_query(nbunch=None, data=False):
                       RETURN u.name AS u, v.name AS v"""
     else:
         nbunch_str = ",".join([f"'{n}'" for n in (nbunch if isinstance(nbunch, list) else [nbunch])])
+        if reverse:
+            node_str = "v"
+        else:
+            node_str = "u"
         if data:
             return """MATCH (u:Node)-[r:Relation]->(v:Node)
-                      WHERE u.name IN [%s]
-                      RETURN u.name AS u, v.name AS v, r""" % nbunch_str
+                      WHERE %s.name IN [%s]
+                      RETURN u.name AS u, v.name AS v, r""" % \
+                   (node_str, nbunch_str)
 
         else:
             return """MATCH (u:Node)-[r:Relation]->(v:Node)
-                      WHERE u.name IN [%s]
-                      RETURN u.name AS u, v.name AS v""" % nbunch_str
+                      WHERE %s.name IN [%s]
+                      RETURN u.name AS u, v.name AS v""" % \
+                   (node_str, nbunch_str)
