@@ -306,10 +306,10 @@ def _edge_view_call_query(nbunch=None, data=False):
         nbunch_str = ",".join([f"'{n}'" for n in nbunch])
         if data:
             return """MATCH (u:Node)-[r:Relation]->(v:Node)
-                      WHERE u.name IN [%s] OR v.name IN [%s]
-                      RETURN u.name AS u, v.name AS v, r""" % (nbunch_str, nbunch_str)
+                      WHERE u.name IN [%s]
+                      RETURN u.name AS u, v.name AS v, r""" % nbunch_str
 
         else:
             return """MATCH (u:Node)-[r:Relation]->(v:Node)
-                      WHERE u.name IN [%s] OR v.name IN [%s]
-                      RETURN u.name AS u, v.name AS v""" % (nbunch_str, nbunch_str)
+                      WHERE u.name IN [%s]
+                      RETURN u.name AS u, v.name AS v""" % nbunch_str
