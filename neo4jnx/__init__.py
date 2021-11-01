@@ -209,21 +209,22 @@ class EdgeView:
         except IndexError:
             raise KeyError(edge)
 
-    def __call__(self, data=False, default=None):
+    def __call__(self, nbunch=None, data=False, default=None):
+        # data is bool or attribute name
+        # Get query from helper
+        query = _edge_view_call_query(nbunch, data)
         with self.graph.driver.session() as session:
-            query = """MATCH (u:Node)-[r:Relation]->(v:Node)
-                       RETURN u.Node AS u, v.Node AS v"""
-            edges = [(r["u"], r["v"], r["edge"].properties) for r in
-                     session.run(query)]
-            if not data:
-                for u, v, _ in edges:
-                    yield u, v
-            elif isinstance(data, bool):
-                for u, v, d in edges:
-                    yield u, v, d
-            else:
-                for u, v, d in edges:
-                    yield u, v, d.get(data, default)
+            for tup in session.run(query):
+                if not data:
+                    yield tup['u'], tup['v']
+                else:
+                    ed = extract_properties(tup[2],
+                                            self.graph.property_loaders)
+                    if isinstance(data, bool):
+                        yd = ed
+                    else:
+                        yd = ed.get(data, default)
+                    yield tup[0], tup[1], yd
 
 
 class AdjacencyView:
