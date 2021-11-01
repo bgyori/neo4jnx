@@ -50,6 +50,12 @@ class Neo4jDiGraph(nx.DiGraph):
     out_edges = edges
 
     @property
+    def in_edges(self):
+        in_edges = InEdgeView(self)
+        self.__dict__["in_edges"] = in_edges
+        return in_edges
+
+    @property
     def pred(self):
         return PredView(self)
 
