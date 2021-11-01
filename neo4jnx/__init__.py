@@ -229,6 +229,16 @@ class EdgeView:
                     yield tup[0], tup[1], yd
 
 
+class InEdgeView(EdgeView):
+    def __init__(self, graph):
+        super().__init__(graph)
+
+    def __getitem__(self, edge):
+        s, t = edge
+        # Reverse edge and call parent
+        return super().__getitem__((t, s))
+
+
 class AdjacencyView:
     def __init__(self, graph):
         self.graph = graph
