@@ -238,6 +238,23 @@ class InEdgeView(EdgeView):
         # Reverse edge and call parent
         return super().__getitem__((t, s))
 
+    def __call__(self, nbunch=None, data=False, default=None):
+        # data is bool or attribute name
+        # Get query from helper
+        query = _edge_view_call_query(nbunch, data, reverse=True)
+        with self.graph.driver.session() as session:
+            for tup in session.run(query):
+                if not data:
+                    yield tup['u'], tup['v']
+                else:
+                    ed = extract_properties(tup[2],
+                                            self.graph.property_loaders)
+                    if isinstance(data, bool):
+                        yd = ed
+                    else:
+                        yd = ed.get(data, default)
+                    yield tup[0], tup[1], yd
+
 
 class AdjacencyView:
     def __init__(self, graph):
