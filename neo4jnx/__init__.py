@@ -160,7 +160,7 @@ class NodeView:
 
     def __call__(self, data=False, default=None):
         with self.graph.driver.session() as session:
-            query = """MATCH (node:`%s`) RETURN node"""
+            query = """MATCH (node:Node) RETURN node"""
             nodes = [r["node"] for r in session.run(query).data()]
             if not data:
                 for n in nodes:
