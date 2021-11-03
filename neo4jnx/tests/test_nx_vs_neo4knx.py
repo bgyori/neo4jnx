@@ -12,7 +12,8 @@ def test_nodes_and_edges():
     assert len(n4_g.edges) == len(nx_g.edges)
 
     # Test node attributes
-    for n in n4_g.nodes:
+    nodes_to_test = choices(list(nx_g.nodes), k=100)
+    for n in nodes_to_test:
         assert n4_g.nodes[n]["ns"] == nx_g.nodes[n]["ns"]
         assert n4_g.nodes[n]["id"] == nx_g.nodes[n]["id"]
 
@@ -31,8 +32,14 @@ def test_nodes_and_edges():
     #  'weight': 0.15082288973458365064,
     #  'z_score': 0,
     #  'corr_weight': 1.0}
-    for e in n4_g.edges:
-        for attr in ["weight", "belief", "corr_weight"]:
+    edges_to_test = choices(list(nx_g.edges), k=100)
+    for e in edges_to_test:
+        for attr in [
+            "weight",
+            "belief",
+            # "z_score",
+            "corr_weight",
+        ]:
             # FixMe: why is z_score missing?
             assert _close_enough(n4_g.edges[e][attr], nx_g.edges[e][attr])
 
@@ -80,7 +87,12 @@ def test_graph_attributes():
 
     for (a, a_data), (b, b_data) in zip(n4_edge_iter, nx_edge_iter):
 
-        for attr in ["weight", "belief", "corr_weight"]:
+        for attr in [
+            "weight",
+            "belief",
+            # "z_score",
+            "corr_weight",
+        ]:
             # FixMe: why is z_score missing?
             assert _close_enough(a_data[attr], b_data[attr])
 
@@ -122,13 +134,19 @@ def _stmt_data_equal(a: dict, b: dict):
         "residue",
         "curated",
     ]:
-        assert a[attr] == b[attr]
+        try:
+            assert a[attr] == b[attr]
+        except KeyError:  # Handle ontology edges with missing position/residue
+            assert (
+                attr == "residue"
+                or attr == "position"
+                and a["stmt_type"] == b["stmt_type"] == "fplx"
+            )
     # Test attributes with float values
     for attr in ["belief", "weight"]:
         assert _close_enough(a[attr], b[attr])
     # Check 'evidence_count'
     assert all(
-        b["source_counts"][src] == count
-        for src, count in a["source_counts"].items()
+        b["source_counts"][src] == count for src, count in a["source_counts"].items()
     )
     return True
