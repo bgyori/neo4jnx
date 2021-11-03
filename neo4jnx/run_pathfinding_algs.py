@@ -89,7 +89,7 @@ def run_open_dijkstra(
 ):
     api = IndraNetworkSearchAPI(graph, DiGraph())
     start_node = {"source" if not reverse else "target": start}
-    if filters["weighted"] == "context":
+    if weighted == "context":
         raise ValueError(
             "Context weighted search is not supported for neo4j graphs currently"
         )
