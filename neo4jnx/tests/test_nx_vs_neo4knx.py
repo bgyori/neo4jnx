@@ -131,6 +131,19 @@ def test_shortest_simple_paths():
     assert basemodels_equal(path_res_nx, path_res_n4j, any_item=True)
 
 
+def test_dijkstra():
+    # FixMe: need make g._succ/_adj to behave dict-like
+    # Run dijkstra on a random node that has successors
+    node = choice(list(nx_g.nodes))
+    while len(nx_g.succ[node]) == 0:
+        # Try again if the picked node is a leaf node
+        node = choice(list(nx_g.nodes))
+
+    path_res_nx = run_open_dijkstra(graph=nx_g, start=node, reverse=False)
+    path_res_n4j = run_open_dijkstra(graph=n4_g, start=node, reverse=False)
+    assert basemodels_equal(path_res_nx, path_res_n4j, any_item=True)
+
+
 def _close_enough(a: float, b: float):
     """Test that two floats are close enough"""
     return abs(a - b) < 1e-9
