@@ -263,26 +263,35 @@ class InEdgeView(EdgeView):
 
 
 class AdjacencyView:
-    def __init__(self, graph):
+    def __init__(self, graph, dict_like=False):
+        self.dict_like = dict_like
         self.graph = graph
 
     def __getitem__(self, n):
+        if self.dict_like:
+            return AtlasViewDict(self.graph, n, 'out')
         return AtlasView(self.graph, n, 'out')
 
 
 class PredView(AdjacencyView):
-    def __init__(self, graph):
+    def __init__(self, graph, dict_like=False):
+        self.dict_like = dict_like
         super().__init__(graph)
 
     def __getitem__(self, n):
+        if self.dict_like:
+            return AtlasViewDict(self.graph, n, 'in')
         return AtlasView(self.graph, n, 'in')
 
 
 class SuccView(AdjacencyView):
-    def __init__(self, graph):
+    def __init__(self, graph, dict_like=False):
+        self.dict_like = dict_like
         super().__init__(graph)
 
     def __getitem__(self, n):
+        if self.dict_like:
+            return AtlasViewDict(self.graph, n, 'out')
         return AtlasView(self.graph, n, 'out')
 
 
