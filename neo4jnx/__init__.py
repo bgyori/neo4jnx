@@ -23,6 +23,9 @@ class Neo4jDiGraph(nx.DiGraph):
         self.driver = GraphDatabase.driver(neo4j_url, auth=neo4j_auth)
         self.session = None
         self.property_loaders = property_loaders
+        self._succ = SuccView(self, dict_like=True)
+        self._adj = AdjacencyView(self, dict_like=True)
+        self._pred = PredView(self, dict_like=True)
         super().__init__(*args, **kwargs)
 
     def __getitem__(self, n):
