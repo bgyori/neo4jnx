@@ -33,8 +33,8 @@ def run_shortest_simple_paths(graph, start, end, **filters):
 
     Returns
     -------
-    list
-        A list of lists of nodes.
+    :
+        PathResultData for shortest simple paths
     """
     api = IndraNetworkSearchAPI(graph, DiGraph())
     try:
@@ -66,8 +66,8 @@ def run_bfs(graph, start: str, reverse: bool, **filters):
 
     Returns
     -------
-    list
-        A list of lists of nodes.
+    :
+        PathResultData for bfs_search
     """
     api = IndraNetworkSearchAPI(graph, DiGraph())
     start_node = {"source" if not reverse else "target": start}

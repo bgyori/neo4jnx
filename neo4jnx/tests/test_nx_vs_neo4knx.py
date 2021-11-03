@@ -117,6 +117,20 @@ def test_bfs_search():
     assert basemodels_equal(path_res_nx, path_res_n4j, any_item=True)
 
 
+def test_shortest_simple_paths():
+    # Run ssp between two random nodes that have successors/predeceesors
+    node = choice(list(nx_g.nodes))
+    while len(nx_g.succ[node]) == 0:
+        node = choice(list(nx_g.nodes))
+    end = choice(list(nx_g.succ[node]))
+    while end == node or len(nx_g.pred[node]) == 0:
+        end = choice(list(nx_g.succ[node]))
+
+    path_res_nx = run_shortest_simple_paths(graph=nx_g, start=node, end=end)
+    path_res_n4j = run_shortest_simple_paths(graph=n4_g, start=node, end=end)
+    assert basemodels_equal(path_res_nx, path_res_n4j, any_item=True)
+
+
 def _close_enough(a: float, b: float):
     """Test that two floats are close enough"""
     return abs(a - b) < 1e-9
