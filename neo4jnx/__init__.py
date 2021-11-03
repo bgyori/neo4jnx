@@ -32,7 +32,7 @@ class Neo4jDiGraph(nx.DiGraph):
         query = """
             MATCH ({name: '%s'})-[r:Relation]-(t)
             RETURN r, t
-        """ % n
+        """ % _clean_name(n)
         res = self.query_tx(query)
         return {r[1]['name']: extract_properties(r[0], self.property_loaders)
                 for r in res}
@@ -207,13 +207,10 @@ class EdgeView:
         # AtlasView's __getitem__, but here that method is exposed
         # directly when using graph.edges[(s, t)]
         # Timing ~100 ms
-        if "'" in s:
-            s = s.replace("'", r"\'")
-        if "'" in t:
-            t = t.replace("'", r"\'")
+
         query = """MATCH (u:Node)-[r:Relation]->(v:Node)
                    WHERE u.name = '%s' AND v.name = '%s'
-                   RETURN r""" % (s, t)
+                   RETURN r""" % (_clean_name(s), _clean_name(t))
         try:
             return extract_properties(self.graph.query_tx(query)[0][0],
                                       self.graph.property_loaders)
@@ -306,11 +303,11 @@ class AtlasView:
         if self.direction == 'out':
             query = """MATCH (u:Node)-[r:Relation]->(v:Node)
                     WHERE u.name = '%s'
-                    RETURN v.name""" % self.n
+                    RETURN v.name""" % _clean_name(self.n)
         else:
             query = """MATCH (u:Node)-[r:Relation]->(v:Node)
                     WHERE v.name = '%s'
-                    RETURN u.name""" % self.n
+                    RETURN u.name""" % _clean_name(self.n)
         res = self.graph.query_tx(query)
         for r in res:
             yield r[0]
@@ -325,13 +322,9 @@ class AtlasView:
             return self.relation_from_source_target(n, self.n)
 
     def relation_from_source_target(self, s, t):
-        if "'" in s:
-            s = s.replace("'", r"\'")
-        if "'" in t:
-            t = t.replace("'", r"\'")
         query = """MATCH (u:Node)-[r:Relation]->(v:Node)
                    WHERE u.name = '%s' AND v.name = '%s'
-                   RETURN r""" % (s, t)
+                   RETURN r""" % (_clean_name(s), _clean_name(t))
         return extract_properties(self.graph.query_tx(query)[0][0],
                                   self.graph.property_loaders)
 
@@ -350,11 +343,11 @@ class AtlasViewDict(AtlasView):
         if self.direction == 'out':
             query = """MATCH (u:Node)-[r:Relation]->(v:Node)
                     WHERE u.name = '%s'
-                    RETURN v.name as v, r""" % self.n
+                    RETURN v.name as v, r""" % _clean_name(self.n)
         else:
             query = """MATCH (u:Node)-[r:Relation]->(v:Node)
                     WHERE v.name = '%s'
-                    RETURN u.name as u, r""" % self.n
+                    RETURN u.name as u, r""" % _clean_name(self.n)
         res = self.graph.query_tx(query)
         for n, r in res:
             yield n, extract_properties(r, self.graph.property_loaders)
@@ -373,7 +366,9 @@ def _edge_view_call_query(nbunch=None, data=False, reverse=False):
             return """MATCH (u:Node)-[r:Relation]->(v:Node)
                       RETURN u.name AS u, v.name AS v"""
     else:
-        nbunch_str = ",".join([f"'{n}'" for n in (nbunch if isinstance(nbunch, list) else [nbunch])])
+        nbunch_str = ",".join(
+            [f"'{_clean_name(n)}'" for n in
+             (nbunch if isinstance(nbunch, list) else [nbunch])])
         if reverse:
             node_str = "v"
         else:
@@ -389,3 +384,9 @@ def _edge_view_call_query(nbunch=None, data=False, reverse=False):
                       WHERE %s.name IN [%s]
                       RETURN u.name AS u, v.name AS v""" % \
                    (node_str, nbunch_str)
+
+
+def _clean_name(name):
+    if "'" in name:
+        name = name.replace("'", r"\'")
+    return name
