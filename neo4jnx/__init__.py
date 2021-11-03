@@ -326,6 +326,30 @@ class AtlasView:
                                   self.graph.property_loaders)
 
 
+class AtlasViewDict(AtlasView):
+    """An AtlasView with dict like methods and attributes
+
+    This class is used to create the dict like methods that in networkx are
+    stored on g._succ, g._pred and g._adj.
+    """
+    def __init__(self, graph, n, direction):
+        super().__init__(graph, n, direction)
+
+    def items(self):
+        # Mimic dict items
+        if self.direction == 'out':
+            query = """MATCH (u:Node)-[r:Relation]->(v:Node)
+                    WHERE u.name = '%s'
+                    RETURN v.name as v, r""" % self.n
+        else:
+            query = """MATCH (u:Node)-[r:Relation]->(v:Node)
+                    WHERE v.name = '%s'
+                    RETURN u.name as u, r""" % self.n
+        res = self.graph.query_tx(query)
+        for n, r in res:
+            yield n, extract_properties(r, self.graph.property_loaders)
+
+
 def _edge_view_call_query(nbunch=None, data=False, reverse=False):
     # If nbunch is None, return all edges, otherwise filter to the ones
     # that are in nbunch
