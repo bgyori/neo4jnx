@@ -132,7 +132,7 @@ def test_shortest_simple_paths():
 
 
 def test_dijkstra():
-    # FixMe: need make g._succ/_adj to behave dict-like
+    # FixMe: need g._succ/_adj and they need to behave dict-like
     # Run dijkstra on a random node that has successors
     node = choice(list(nx_g.nodes))
     while len(nx_g.succ[node]) == 0:
