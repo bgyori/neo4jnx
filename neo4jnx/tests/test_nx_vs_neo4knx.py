@@ -144,6 +144,24 @@ def test_dijkstra():
     assert basemodels_equal(path_res_nx, path_res_n4j, any_item=True)
 
 
+def test_shared_interactors():
+    # Run shared_interactors
+
+    # Pick two nodes that has at least one node in common downstream
+    nodes_list = list(nx_g.nodes)
+    node1 = choice(nodes_list)
+    node2 = choice(nodes_list)
+    while node1 == node2 or not set(nx_g.pred[node1]) & set(nx_g.pred[node2]):
+        node1 = choice(nodes_list)
+        node2 = choice(nodes_list)
+
+    interactors_nx = run_shared_interactors(graph=nx_g, node1=node1,
+                                            node2=node2, downstream=True)
+    interactors_n4j = run_shared_interactors(graph=n4_g, node1=node1,
+                                             node2=node2, downstream=True)
+    assert basemodels_equal(interactors_nx, interactors_n4j, any_item=True)
+
+
 def _close_enough(a: float, b: float):
     """Test that two floats are close enough"""
     return abs(a - b) < 1e-9
