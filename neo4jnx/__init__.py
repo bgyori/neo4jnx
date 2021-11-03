@@ -339,8 +339,8 @@ class AtlasView:
 class AtlasViewDict(AtlasView):
     """An AtlasView with dict like methods and attributes
 
-    This class is used to create the dict like methods that in networkx are
-    stored on g._succ, g._pred and g._adj.
+    This class is used to create dict like methods in order to mimic
+    networkx's g._succ, g._pred and g._adj.
     """
     def __init__(self, graph, n, direction):
         super().__init__(graph, n, direction)
