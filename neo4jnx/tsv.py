@@ -1,6 +1,20 @@
 import csv
 import gzip
 import json
+import numpy as np
+from tqdm import tqdm
+
+
+class NumPyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        else:
+            return super(NumPyEncoder, self).default(obj)
 
 
 def get_data_value(data, key):
@@ -8,7 +22,7 @@ def get_data_value(data, key):
     if not val:
         return ""
     elif isinstance(val, (list, dict)):
-        return json.dumps(val)
+        return json.dumps(val, cls=NumPyEncoder)
     elif isinstance(val, str):
         return val.replace('\n', ' ')
     else:
@@ -26,7 +40,7 @@ def graph_to_tsv(g, nodes_path, edges_path):
     node_rows = (
         (canonicalize(node), 'Node',
          *[get_data_value(data, key) for key in metadata])
-        for node, data in g.nodes(data=True)
+        for node, data in tqdm(g.nodes(data=True), total=len(g.nodes))
     )
 
     with gzip.open(nodes_path, mode="wt") as fh:
@@ -41,7 +55,7 @@ def graph_to_tsv(g, nodes_path, edges_path):
             canonicalize(u), canonicalize(v), 'Relation',
             *[get_data_value(data, key) for key in metadata],
         )
-        for u, v, data in g.edges(data=True)
+        for u, v, data in tqdm(g.edges(data=True), total=len(g.edges))
     )
 
     with gzip.open(edges_path, "wt") as fh:
