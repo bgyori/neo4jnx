@@ -84,15 +84,21 @@ def run_bfs(graph, start: str, reverse: bool, **filters):
     return res.get_results()
 
 
-def run_open_dijkstra(graph, start: str, reverse: bool, **filters):
+def run_open_dijkstra(
+    graph, start: str, reverse: bool, weighted: str = "belief", **filters
+):
     api = IndraNetworkSearchAPI(graph, DiGraph())
     start_node = {"source" if not reverse else "target": start}
+    if filters["weighted"] == "context":
+        raise ValueError(
+            "Context weighted search is not supported for neo4j graphs currently"
+        )
     try:
-        query = NetworkSearchQuery(**start_node, **filters)
+        query = NetworkSearchQuery(weighted=weighted, **start_node, **filters)
     except Exception as e:
         logger.exception(e)
         logger.warning("One or more filters are invalid")
-        query = NetworkSearchQuery(**start_node)
+        query = NetworkSearchQuery(weighted=weighted, **start_node)
 
     # Create a dijkstra query
     dijk_query = DijkstraQuery(query)
@@ -164,7 +170,5 @@ def get_subgraph(g, start_node: str, max_edges=10000):
     new_g.add_edges_from((u, v, d) for (u, v), d in g.edges.items() if (u, v) in edges)
     new_g.graph.update(g.graph)
 
-    print(f'Made new graph with {len(new_g.edges)} edges and '
-          f'{len(new_g.nodes)} nodes')
+    print(f"Made new graph with {len(new_g.edges)} edges and {len(new_g.nodes)} nodes")
     return new_g
-
