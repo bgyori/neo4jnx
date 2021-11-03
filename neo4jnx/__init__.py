@@ -278,8 +278,7 @@ class AdjacencyView:
 
 class PredView(AdjacencyView):
     def __init__(self, graph, dict_like=False):
-        self.dict_like = dict_like
-        super().__init__(graph)
+        super().__init__(graph, dict_like)
 
     def __getitem__(self, n):
         if self.dict_like:
@@ -289,8 +288,7 @@ class PredView(AdjacencyView):
 
 class SuccView(AdjacencyView):
     def __init__(self, graph, dict_like=False):
-        self.dict_like = dict_like
-        super().__init__(graph)
+        super().__init__(graph, dict_like)
 
     def __getitem__(self, n):
         if self.dict_like:
