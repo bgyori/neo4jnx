@@ -203,9 +203,9 @@ class EdgeView:
 
     def __getitem__(self, edge):
         s, t = edge
-        # return lookup of specific edge; looks exactly like
+        # return lookup of specific edge; This looks exactly like the
         # AtlasView's __getitem__, but here that method is exposed
-        # directly when using graph.edges[(s, t)]
+        # directly so it can be used for graph.edges[(s, t)]
         # Timing ~100 ms
 
         query = """MATCH (u:Node)-[r:Relation]->(v:Node)
