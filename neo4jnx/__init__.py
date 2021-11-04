@@ -398,8 +398,12 @@ def _edge_view_call_query(nbunch=None, data=False, reverse=False):
 
 
 def _clean_name(name):
-    if "'" in name:
-        name = name.replace("'", r"\'")
+    """Escapes strings used in queries"""
+    # Escape backslashes first, otherwise they will be escaped again
     if "\\" in name:
         name = name.replace("\\", r"\\")
+    # Now escape anything else
+    if "'" in name:
+        name = name.replace("'", r"\'")
+
     return name
