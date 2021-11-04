@@ -6,6 +6,11 @@ from tqdm import tqdm
 
 
 class NumPyEncoder(json.JSONEncoder):
+    """Handle NumPy types when json-dumping
+
+    Courtesy of:
+    https://stackoverflow.com/a/27050186/10478812
+    """
     def default(self, obj):
         if isinstance(obj, np.integer):
             return int(obj)
