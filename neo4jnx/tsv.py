@@ -4,6 +4,18 @@ import json
 import numpy as np
 from tqdm import tqdm
 
+# See more at:
+# https://neo4j.com/docs/cypher-manual/current/syntax/values/
+# Integer, Float, String, Boolean,
+# TodO: Look at composite types to store the statements list of dicts
+#  https://neo4j.com/docs/cypher-manual/current/syntax/values/#composite-types
+DEFAULT_TYPE_MAP = {
+    "weight": "Float",
+    "corr_weight": "Float",
+    "z_score": "Float",
+    "belief": "Float",
+}
+
 
 class NumPyEncoder(json.JSONEncoder):
     """Handle NumPy types when json-dumping
