@@ -312,6 +312,17 @@ class AtlasView:
         for r in res:
             yield r[0]
 
+    def __len__(self):
+        if self.direction == 'out':
+            query = """MATCH (u:Node)-[r:Relation]->(v:Node)
+                       WHERE u.name = '%s'
+                       RETURN count(v)""" % _clean_name(self.n)
+        else:
+            query = """MATCH (u:Node)-[r:Relation]->(v:Node)
+                       WHERE v.name = '%s'
+                       RETURN count(u)""" % _clean_name(self.n)
+        return self.graph.query_tx(query)[0][0]
+
     def __contains__(self, n):
         return True if self[n] else False
 
