@@ -6,14 +6,17 @@ from tqdm import tqdm
 
 # See more at:
 # https://neo4j.com/docs/cypher-manual/current/syntax/values/
-# Integer, Float, String, Boolean,
+# and
+# https://neo4j.com/docs/operations-manual/current/tools/neo4j-admin/neo4j-admin-import/#import-tool-header-format-properties
+# int, long, float, double, boolean, byte, short, char, string, point, date,
+# localtime, time, localdatetime, datetime, and duration
 # TodO: Look at composite types to store the statements list of dicts
 #  https://neo4j.com/docs/cypher-manual/current/syntax/values/#composite-types
 DEFAULT_TYPE_MAP = {
-    "weight": "Float",
-    "corr_weight": "Float",
-    "z_score": "Float",
-    "belief": "Float",
+    "weight": "float",
+    "corr_weight": "float",
+    "z_score": "float",
+    "belief": "float",
 }
 
 
