@@ -19,7 +19,7 @@ class NumPyEncoder(json.JSONEncoder):
 
 def get_data_value(data, key):
     val = data.get(key)
-    if not val:
+    if val is None or val == '':
         return ""
     elif isinstance(val, (list, dict)):
         return json.dumps(val, cls=NumPyEncoder)
