@@ -37,10 +37,9 @@ def test_nodes_and_edges():
         for attr in [
             "weight",
             "belief",
-            # "z_score",
+            "z_score",
             "corr_weight",
         ]:
-            # FixMe: why is z_score missing?
             assert _close_enough(n4_g.edges[e][attr], nx_g.edges[e][attr])
 
         assert len(n4_g.edges[e]["statements"]) == len(nx_g.edges[e]["statements"])
@@ -90,10 +89,9 @@ def test_graph_attributes():
         for attr in [
             "weight",
             "belief",
-            # "z_score",
+            "z_score",
             "corr_weight",
         ]:
-            # FixMe: why is z_score missing?
             assert _close_enough(a_data[attr], b_data[attr])
 
         assert len(a_data["statements"]) == len(b_data["statements"])
@@ -118,7 +116,7 @@ def test_bfs_search():
 
 
 def test_shortest_simple_paths():
-    # Run ssp between two random nodes that have successors/predeceesors
+    # Run ssp between two random nodes that have successors/predecessors
     node = choice(list(nx_g.nodes))
     while len(nx_g.succ[node]) == 0:
         node = choice(list(nx_g.nodes))
