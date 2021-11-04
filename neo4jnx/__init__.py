@@ -389,4 +389,6 @@ def _edge_view_call_query(nbunch=None, data=False, reverse=False):
 def _clean_name(name):
     if "'" in name:
         name = name.replace("'", r"\'")
+    if "\\" in name:
+        name = name.replace("\\", r"\\")
     return name
