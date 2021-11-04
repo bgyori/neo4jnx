@@ -381,9 +381,11 @@ def _edge_view_call_query(nbunch: Nbunch = None,
             return """MATCH (u:Node)-[r:Relation]->(v:Node)
                       RETURN u.name AS u, v.name AS v"""
     else:
-        nbunch_str = ",".join(
-            [f"'{_clean_name(n)}'" for n in
-             (nbunch if isinstance(nbunch, list) else [nbunch])])
+        if isinstance(nbunch, (list, set)):
+            nbunch_str = ",".join(f"'{_clean_name(n)}'" for n in nbunch)
+        else:
+            nbunch_str = f"'{_clean_name(nbunch)}'"
+
         if reverse:
             node_str = "v"
         else:
