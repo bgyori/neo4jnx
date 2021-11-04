@@ -53,7 +53,10 @@ def canonicalize(s):
     return s.replace('\n', ' ')
 
 
-def graph_to_tsv(g, nodes_path, edges_path):
+def graph_to_tsv(g, nodes_path, edges_path, type_map=None):
+    if type_map is None:
+        type_map = DEFAULT_TYPE_MAP
+
     metadata = sorted(set(key for node, data in g.nodes(data=True)
                           for key in data))
     header = "name:ID", ':LABEL', *metadata
