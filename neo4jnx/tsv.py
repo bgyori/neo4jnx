@@ -87,7 +87,8 @@ def graph_to_tsv(g, nodes_path, edges_path, type_map=None):
 
     with gzip.open(edges_path, "wt") as fh:
         edge_writer = csv.writer(fh, delimiter="\t")  # type: ignore
-        header = ":START_ID", ":END_ID", ":TYPE", *metadata
+        header = ":START_ID", ":END_ID", ":TYPE", *[set_type(k, type_map) for k in
+                                                    metadata]
         edge_writer.writerow(header)
         edge_writer.writerows(edge_rows)
 
