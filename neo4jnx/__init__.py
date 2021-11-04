@@ -1,9 +1,12 @@
-from typing import Optional, Union, List, Any
+from typing import Optional, Union, List, Any, Set
 import networkx as nx
 import neo4j
 from neo4j import GraphDatabase
 from networkx import NetworkXError
 
+
+# Derived types
+Nbunch = Union[int, str, List[int], List[str], Set[int], Set[str]]
 
 def extract_properties(properties, property_loaders):
     return {k: extract_value(v, property_loaders.get(k))
@@ -364,7 +367,8 @@ class AtlasViewDict(AtlasView):
             yield n, extract_properties(r, self.graph.property_loaders)
 
 
-def _edge_view_call_query(nbunch=None, data=False, reverse=False):
+def _edge_view_call_query(nbunch: Nbunch = None,
+                          data=False, reverse=False):
     # If nbunch is None, return all edges, otherwise filter to the ones
     # that are in nbunch
     # If data is None, return the edges without edge data otherwise return
