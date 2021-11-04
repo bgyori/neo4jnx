@@ -37,7 +37,7 @@ class NumPyEncoder(json.JSONEncoder):
             return super(NumPyEncoder, self).default(obj)
 
 
-def get_data_value(data, key):
+def get_data_value(data, key, dtype=None):
     val = data.get(key)
     if val is None or val == '':
         return ""
@@ -45,6 +45,9 @@ def get_data_value(data, key):
         return json.dumps(val, cls=NumPyEncoder)
     elif isinstance(val, str):
         return val.replace('\n', ' ')
+    elif isinstance(val, (int, float, np.floating, np.integer)) and dtype in \
+            ('int', 'long', 'float', 'double', 'number') and np.isnan(val):
+        return ""
     else:
         return val
 
@@ -80,7 +83,8 @@ def graph_to_tsv(g, nodes_path, edges_path, type_map=None):
     edge_rows = (
         (
             canonicalize(u), canonicalize(v), 'Relation',
-            *[get_data_value(data, key) for key in metadata],
+            *[get_data_value(data, key, type_map.get(key)) for key in
+              metadata],
         )
         for u, v, data in tqdm(g.edges(data=True), total=len(g.edges))
     )
