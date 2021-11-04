@@ -53,6 +53,10 @@ def canonicalize(s):
     return s.replace('\n', ' ')
 
 
+def set_type(key, type_map) -> str:
+    return f'{key}:{type_map[key]}' if key in type_map else key
+
+
 def graph_to_tsv(g, nodes_path, edges_path, type_map=None):
     if type_map is None:
         type_map = DEFAULT_TYPE_MAP
