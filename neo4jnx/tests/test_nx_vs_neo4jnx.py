@@ -164,6 +164,22 @@ def _close_enough(a: float, b: float):
     return abs(a - b) < 1e-9
 
 
+def _assert_edge_data_equal(a: dict, b: dict):
+    """Test that two edge data dicts are equal"""
+    for attr in [
+        "weight",
+        "belief",
+        "z_score",
+        "corr_weight",
+    ]:
+        assert _close_enough(a[attr], b[attr])
+
+    assert len(a["statements"]) == len(b["statements"])
+
+    for a_stmt, b_stmt in zip(a["statements"], b["statements"]):
+        assert _stmt_data_equal(a_stmt, b_stmt)
+
+
 def _stmt_data_equal(a: dict, b: dict):
     """Test that two statement data dictionaries are equal"""
     # Test attributes that can be checked for equality
@@ -180,14 +196,15 @@ def _stmt_data_equal(a: dict, b: dict):
             assert a[attr] == b[attr]
         except KeyError:  # Handle ontology edges with missing position/residue
             assert (
-                attr == "residue"
-                or attr == "position"
+                (attr == "residue" or attr == "position")
                 and a["stmt_type"] == b["stmt_type"] == "fplx"
             )
+
     # Test attributes with float values
     for attr in ["belief", "weight"]:
         assert _close_enough(a[attr], b[attr])
-    # Check 'evidence_count'
+
+    # Check 'source_counts'
     assert all(
         b["source_counts"][src] == count for src, count in a["source_counts"].items()
     )
