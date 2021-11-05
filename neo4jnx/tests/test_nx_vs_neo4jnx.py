@@ -6,12 +6,14 @@ from neo4jnx.run_pathfinding_algs import *
 from indra_network_search.tests.util import basemodels_equal
 
 
-def test_nodes_and_edges():
+# Testing g.nodes, g.edges
+def test_nodes_edges_count():
     # Test that the number of nodes and edges are the same
     assert len(n4_g.nodes) == len(nx_g.nodes)
     assert len(n4_g.edges) == len(nx_g.edges)
 
-    # Test node attributes
+
+def test_node_attributes():
     nodes_to_test = choices(list(nx_g.nodes), k=100)
     for n in nodes_to_test:
         nx_node_data = nx_g.nodes[n]
@@ -19,7 +21,8 @@ def test_nodes_and_edges():
         assert n4_node_data["ns"] == nx_node_data["ns"]
         assert n4_node_data["id"] == nx_node_data["id"]
 
-    # Test edge attributes
+
+def test_edge_attributes():
     # {'statements': [{'stmt_hash': 29290247440853755,
     #    'stmt_type': 'Inhibition',
     #    'evidence_count': 2,
@@ -42,7 +45,7 @@ def test_nodes_and_edges():
         _assert_edge_data_equal(n4_data, nx_data)
 
 
-def test_graph_attributes():
+def test_graph_attributes_nodes():
 
     # Select a node at random
     node = choice(list(nx_g.nodes))
@@ -61,6 +64,9 @@ def test_graph_attributes():
     # Test g.predecessors
     assert set(n4_g.predecessors(node)) == set(nx_g.predecessors(node))
 
+    # Test g.in_edges
+    assert set(n4_g.in_edges(node)) == set(nx_g.in_edges(node))
+
     # Test g.__getitem__
     b = list(nx_g[node])[0]
     nx_data = nx_g[node][b]
@@ -77,6 +83,8 @@ def test_graph_attributes():
     # Test g.__iter__
     assert {n for n in n4_g} == {n for n in nx_g}
 
+
+def test_graph_attributes_edges():
     # Pick an edge at random
     edge = choice(list(nx_g.edges))
 
@@ -105,9 +113,6 @@ def test_graph_attributes():
 
     for (a, a_data), (b, b_data) in zip(n4_edge_iter, nx_edge_iter):
         _assert_edge_data_equal(a_data, b_data)
-
-    # Test g.in_edges
-    assert set(n4_g.in_edges(node)) == set(nx_g.in_edges(node))
 
 
 # Test algorithms
