@@ -1,6 +1,8 @@
 """Tests that compare a neo4jnx graph to a networkx graph"""
 
 from random import choice, choices
+
+from indra.explanation.pathfinding import find_sources
 from neo4jnx.tests.util import n4_g, nx_g
 from neo4jnx.run_pathfinding_algs import *
 from indra_network_search.tests.util import basemodels_equal
@@ -176,6 +178,24 @@ def test_shared_interactors():
     interactors_n4j = run_shared_interactors(graph=n4_g, node1=node1,
                                              node2=node2, downstream=True)
     assert basemodels_equal(interactors_nx, interactors_n4j, any_item=True)
+
+
+def test_find_sources():
+    # Run find_sources
+
+    # Pick a node that has at least one predecessor
+    node = choice(list(nx_g.nodes))
+    while len(nx_g.pred[node]) == 0:
+        node = choice(list(nx_g.nodes))
+    sources = list(nx_g.pred[node])
+
+    sources_iter_nx = find_sources(graph=nx_g, target=node, sources=sources)
+    sources_iter_n4 = find_sources(graph=n4_g, target=node, sources=sources)
+
+    for (nx_source, nx_len), (n4_source, n4_len) in zip(sources_iter_nx,
+                                                        sources_iter_n4):
+        assert nx_source == n4_source
+        assert nx_len == n4_len
 
 
 def _close_enough(a: float, b: float):
