@@ -143,9 +143,8 @@ def test_shortest_simple_paths():
     assert basemodels_equal(path_res_nx, path_res_n4j, any_item=True)
 
 
-# Note: this test takes at least 3-4 min for the nee4jnx graph,
-# if weights_sum in open_dijkstra_search() uses g.edges[(u, v)] instead of
-# g[u][v]
+# Note: this test takes at least 3-4 min for the nee4jnx graph, if weights_sum
+# in open_dijkstra_search() uses g.edges[(u, v)] instead of g[u][v]
 def test_dijkstra():
     print('The dijkstra test takes 3-4 min')
     # Run dijkstra on a random node that has successors
