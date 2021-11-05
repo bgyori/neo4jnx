@@ -8,6 +8,7 @@ from networkx import NetworkXError
 # Derived types
 Nbunch = Union[int, str, List[int], List[str], Set[int], Set[str]]
 
+
 def extract_properties(properties, property_loaders):
     return {k: extract_value(v, property_loaders.get(k))
             for k, v in properties.items()}
@@ -140,6 +141,25 @@ class Neo4jDiGraph(nx.DiGraph):
             sess = self.driver.session()
             self.session = sess
         return self.session
+
+    def reverse(self, copy=False):
+        """Return the graph with the edges reversed"""
+        # FixMe: For this to work, we need to have:
+        #  - a way to get the neo4j_url and authorization used from the
+        #    current instance.
+        #  - a way to reverse g.succ and g.pred. Since they are properties,
+        #    they cannot simply be overwritten.
+        #  - a way to swap around g.edges, g.out_edges and g.in_edges.
+        # if copy:
+        #     raise NotImplementedError("copy=True is not implemented. "
+        #                               "Neo4jDiGraphs are not writable")
+        raise NotImplementedError("Reverse is not implemented.")
+        # h = self.__class__(self.neo4j_url, self.neo4j_auth,
+        #                    self.property_loaders)
+        # h._succ, h._pred = self._pred, self._succ
+        # h._adj = h._succ
+        #
+        # return h
 
 
 class NodeView:
