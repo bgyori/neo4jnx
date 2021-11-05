@@ -14,8 +14,10 @@ def test_nodes_and_edges():
     # Test node attributes
     nodes_to_test = choices(list(nx_g.nodes), k=100)
     for n in nodes_to_test:
-        assert n4_g.nodes[n]["ns"] == nx_g.nodes[n]["ns"]
-        assert n4_g.nodes[n]["id"] == nx_g.nodes[n]["id"]
+        nx_node_data = nx_g.nodes[n]
+        n4_node_data = n4_g.nodes[n]
+        assert n4_node_data["ns"] == nx_node_data["ns"]
+        assert n4_node_data["id"] == nx_node_data["id"]
 
     # Test edge attributes
     # {'statements': [{'stmt_hash': 29290247440853755,
@@ -34,17 +36,10 @@ def test_nodes_and_edges():
     #  'corr_weight': 1.0}
     edges_to_test = choices(list(nx_g.edges), k=100)
     for e in edges_to_test:
-        for attr in [
-            "weight",
-            "belief",
-            "z_score",
-            "corr_weight",
-        ]:
-            assert _close_enough(n4_g.edges[e][attr], nx_g.edges[e][attr])
+        n4_data = n4_g.edges[e]
+        nx_data = nx_g.edges[e]
 
-        assert len(n4_g.edges[e]["statements"]) == len(nx_g.edges[e]["statements"])
-        for a, b in zip(nx_g.edges[e]["statements"], n4_g.edges[e]["statements"]):
-            assert _stmt_data_equal(a, b)
+        _assert_edge_data_equal(n4_data, nx_data)
 
 
 def test_graph_attributes():
