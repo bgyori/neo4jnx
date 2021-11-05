@@ -46,15 +46,13 @@ def test_edge_attributes():
 
 
 def test_graph_attributes_nodes():
-
-    # Select a node at random
     node = choice(list(nx_g.nodes))
 
     # Test g.succ
     assert len(n4_g.succ[node]) == len(nx_g.succ[node])
     assert set(n4_g.succ[node]) == set(nx_g.succ[node])
 
-    # Test g.succesors
+    # Test g.successors
     assert set(n4_g.successors(node)) == set(nx_g.successors(node))
 
     # Test g.pred
@@ -68,6 +66,10 @@ def test_graph_attributes_nodes():
     assert set(n4_g.in_edges(node)) == set(nx_g.in_edges(node))
 
     # Test g.__getitem__
+    # Make sure that the node has successors
+    while len(nx_g.succ[node]) == 0:
+        node = choice(list(nx_g.nodes))
+
     b = list(nx_g[node])[0]
     nx_data = nx_g[node][b]
     n4_data = n4_g[node][b]
