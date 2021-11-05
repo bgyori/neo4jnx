@@ -61,12 +61,36 @@ def test_graph_attributes():
     # Test g.predecessors
     assert set(n4_g.predecessors(node)) == set(nx_g.predecessors(node))
 
-    # TodO: Test more node stuff
+    # Test g.__getitem__
+    b = list(nx_g[node])[0]
+    nx_data = nx_g[node][b]
+    n4_data = n4_g[node][b]
+    _assert_edge_data_equal(n4_data, nx_data)
+
+    # Test g.__contains__
+    assert node in n4_g
+    assert node in nx_g
+
+    # Test g.__len__
+    assert len(n4_g) == len(nx_g)
+
+    # Test g.__iter__
+    assert {n for n in n4_g} == {n for n in nx_g}
 
     # Pick an edge at random
     edge = choice(list(nx_g.edges))
 
-    # ToDo: Test more edge stuff
+    # Test g.edges.__getitem__
+    nx_edge_data = nx_g.edges[edge]
+    n4_edge_data = n4_g.edges[edge]
+    _assert_edge_data_equal(n4_edge_data, nx_edge_data)
+
+    # Test g.edges.__contains__
+    assert edge in n4_g.edges
+    assert edge in nx_g.edges
+
+    # Test g.edges.__iter__
+    assert {e for e in n4_g.edges} == {e for e in nx_g.edges}
 
     # Test that nx_g.edges() behaves the same as nx_g.edges()
     random_nodes = set(choices(list(nx_g.nodes), k=10))
@@ -80,19 +104,7 @@ def test_graph_attributes():
     assert len(n4_edge_iter) == len(nx_edge_iter)
 
     for (a, a_data), (b, b_data) in zip(n4_edge_iter, nx_edge_iter):
-
-        for attr in [
-            "weight",
-            "belief",
-            "z_score",
-            "corr_weight",
-        ]:
-            assert _close_enough(a_data[attr], b_data[attr])
-
-        assert len(a_data["statements"]) == len(b_data["statements"])
-
-        for a_stmt, b_stmt in zip(a_data["statements"], b_data["statements"]):
-            assert _stmt_data_equal(a_stmt, b_stmt)
+        _assert_edge_data_equal(a_data, b_data)
 
     # Test g.in_edges
     assert set(n4_g.in_edges(node)) == set(nx_g.in_edges(node))
