@@ -1,16 +1,53 @@
 import csv
 import gzip
 import json
+import numpy as np
+from tqdm import tqdm
+
+# See more at:
+# https://neo4j.com/docs/cypher-manual/current/syntax/values/
+# and
+# https://neo4j.com/docs/operations-manual/current/tools/neo4j-admin/neo4j-admin-import/#import-tool-header-format-properties
+# int, long, float, double, boolean, byte, short, char, string, point, date,
+# localtime, time, localdatetime, datetime, and duration
+# TodO: Look at composite types to store the statements list of dicts
+#  https://neo4j.com/docs/cypher-manual/current/syntax/values/#composite-types
+DEFAULT_TYPE_MAP = {
+    "weight": "float",
+    "corr_weight": "float",
+    "z_score": "float",
+    "belief": "float",
+}
 
 
-def get_data_value(data, key):
+class NumPyEncoder(json.JSONEncoder):
+    """Handle NumPy types when json-dumping
+
+    Courtesy of:
+    https://stackoverflow.com/a/27050186/10478812
+    """
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        else:
+            return super(NumPyEncoder, self).default(obj)
+
+
+def get_data_value(data, key, dtype=None):
     val = data.get(key)
-    if not val:
+    if val is None or val == '':
         return ""
     elif isinstance(val, (list, dict)):
-        return json.dumps(val)
+        return json.dumps(val, cls=NumPyEncoder)
     elif isinstance(val, str):
         return val.replace('\n', ' ')
+    elif isinstance(val, (int, float, np.floating, np.integer)) and dtype in \
+            ('int', 'long', 'float', 'double', 'number') and np.isnan(val):
+        return ""
     else:
         return val
 
@@ -19,14 +56,21 @@ def canonicalize(s):
     return s.replace('\n', ' ')
 
 
-def graph_to_tsv(g, nodes_path, edges_path):
+def set_type(key, type_map) -> str:
+    return f'{key}:{type_map[key]}' if key in type_map else key
+
+
+def graph_to_tsv(g, nodes_path, edges_path, type_map=None):
+    if type_map is None:
+        type_map = DEFAULT_TYPE_MAP
+
     metadata = sorted(set(key for node, data in g.nodes(data=True)
                           for key in data))
     header = "name:ID", ':LABEL', *metadata
     node_rows = (
         (canonicalize(node), 'Node',
          *[get_data_value(data, key) for key in metadata])
-        for node, data in g.nodes(data=True)
+        for node, data in tqdm(g.nodes(data=True), total=len(g.nodes))
     )
 
     with gzip.open(nodes_path, mode="wt") as fh:
@@ -39,14 +83,16 @@ def graph_to_tsv(g, nodes_path, edges_path):
     edge_rows = (
         (
             canonicalize(u), canonicalize(v), 'Relation',
-            *[get_data_value(data, key) for key in metadata],
+            *[get_data_value(data, key, type_map.get(key)) for key in
+              metadata],
         )
-        for u, v, data in g.edges(data=True)
+        for u, v, data in tqdm(g.edges(data=True), total=len(g.edges))
     )
 
     with gzip.open(edges_path, "wt") as fh:
         edge_writer = csv.writer(fh, delimiter="\t")  # type: ignore
-        header = ":START_ID", ":END_ID", ":TYPE", *metadata
+        header = ":START_ID", ":END_ID", ":TYPE", *[set_type(k, type_map) for k in
+                                                    metadata]
         edge_writer.writerow(header)
         edge_writer.writerows(edge_rows)
 
