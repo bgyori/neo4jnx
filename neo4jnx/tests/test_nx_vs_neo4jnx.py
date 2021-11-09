@@ -201,7 +201,19 @@ def test_find_sources():
 
 
 # FixMe: Something in the neo4jnx graph implementation is causing this test
-#  to be very slow.
+#  to be very slow. Probably due to the almost 6 orders of magnitude
+#  difference in g[node] lookup:
+# In [2]: %timeit n4_g['Wounds and Injuries']
+# 6.61 ms ± 385 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+#
+# In [3]: %timeit nx_g['Wounds and Injuries']
+# 613 ns ± 44 ns per loop (mean ± std. dev. of 7 runs, 1000000 loops each)
+#
+# In [4]: %timeit nx_g['BRCA1']
+# 840 ns ± 103 ns per loop (mean ± std. dev. of 7 runs, 1000000 loops each)
+#
+# In [5]: %timeit n4_g['BRCA1']
+# 232 ms ± 9.27 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
 def test_simple_paths_with_constraints():
     # Run simple_paths_with_constraints between two random nodes that have
     # an intermediate node in common, i.e. a-x-b
