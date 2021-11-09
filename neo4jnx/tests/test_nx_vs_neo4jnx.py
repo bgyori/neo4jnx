@@ -1,8 +1,10 @@
 """Tests that compare a neo4jnx graph to a networkx graph"""
-
+from itertools import islice
 from random import choice, choices
 
 from indra.explanation.pathfinding import find_sources
+from indra.explanation.pathfinding.pathfinding import \
+    simple_paths_with_constraints
 from neo4jnx.tests.util import n4_g, nx_g
 from neo4jnx.run_pathfinding_algs import *
 from indra_network_search.tests.util import basemodels_equal
@@ -196,6 +198,39 @@ def test_find_sources():
                                                         sources_iter_n4):
         assert nx_source == n4_source
         assert nx_len == n4_len
+
+
+# FixMe: Something in the neo4jnx graph implementation is causing this test
+#  to be very slow.
+def test_simple_paths_with_constraints():
+    # Run simple_paths_with_constraints between two random nodes that have
+    # an intermediate node in common, i.e. a-x-b
+    all_nodes = list(nx_g.nodes)
+
+    start = choice(all_nodes)
+    end = choice(all_nodes)
+    common_nodes = set(nx_g.succ[start]) & set(nx_g.pred[end])
+
+    # Pick an end node that is two steps away from the start node, i.e. {x}
+    # must be non-emtpy for a-{x}-b
+    while len(common_nodes) < 4:
+        start = choice(all_nodes)
+        end = choice(all_nodes)
+        common_nodes = set(nx_g.succ[start]) & set(nx_g.pred[end])
+
+    len_common_nodes = len(common_nodes)
+
+    nx_path_gen = simple_paths_with_constraints(G=nx_g, source=start,
+                                                target=end, cutoff=2,
+                                                allow_shorter=False)
+    nx_paths = {tuple(path) for path in islice(nx_path_gen, len_common_nodes)}
+
+    n4_path_gen = simple_paths_with_constraints(G=n4_g, source=start,
+                                                target=end, cutoff=2,
+                                                allow_shorter=False)
+    n4_paths = {tuple(path) for path in islice(n4_path_gen, len_common_nodes)}
+
+    assert nx_paths == n4_paths
 
 
 def _close_enough(a: float, b: float):
